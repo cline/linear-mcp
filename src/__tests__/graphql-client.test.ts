@@ -9,7 +9,8 @@ import {
   UpdateIssuesResponse,
   SearchIssuesInput,
   SearchIssuesResponse,
-  DeleteIssueResponse
+  DeleteIssueResponse,
+  IssueBatchResponse
 } from '../features/issues/types/issue.types';
 import {
   ProjectInput,
@@ -144,7 +145,7 @@ describe('LinearGraphQLClient', () => {
       expect(mockRawRequest).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          input: [input]
+          input: input
         })
       );
 
@@ -390,7 +391,7 @@ describe('LinearGraphQLClient', () => {
         }
       ];
 
-      const result: CreateIssuesResponse = await graphqlClient.createIssues(issues);
+      const result: IssueBatchResponse = await graphqlClient.createIssues(issues);
 
       expect(result).toEqual(mockResponse.data);
       // Verify single mutation call
@@ -398,7 +399,7 @@ describe('LinearGraphQLClient', () => {
       expect(mockRawRequest).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          input: issues
+          input: { issues }
         })
       );
     });

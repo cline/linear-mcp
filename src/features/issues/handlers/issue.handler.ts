@@ -15,7 +15,8 @@ import {
   UpdateIssuesResponse,
   SearchIssuesResponse,
   DeleteIssueResponse,
-  Issue
+  Issue,
+  IssueBatchResponse
 } from '../types/issue.types.js';
 
 /**
@@ -67,13 +68,13 @@ export class IssueHandler extends BaseHandler implements IssueHandlerMethods {
         throw new Error('Issues parameter must be an array');
       }
 
-      const result = await client.createIssues(args.issues) as CreateIssuesResponse;
+      const result = await client.createIssues(args.issues) as IssueBatchResponse;
 
-      if (!result.issueCreate.success) {
+      if (!result.issueBatchCreate.success) {
         throw new Error('Failed to create issues');
       }
 
-      const createdIssues = result.issueCreate.issues as Issue[];
+      const createdIssues = result.issueBatchCreate.issues as Issue[];
 
       return this.createResponse(
         `Successfully created ${createdIssues.length} issues:\n` +
