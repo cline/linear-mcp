@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 export const SEARCH_ISSUES_QUERY = gql`
   query SearchIssues(
@@ -7,12 +7,7 @@ export const SEARCH_ISSUES_QUERY = gql`
     $after: String
     $orderBy: PaginationOrderBy
   ) {
-    issues(
-      filter: $filter
-      first: $first
-      after: $after
-      orderBy: $orderBy
-    ) {
+    issues(filter: $filter, first: $first, after: $after, orderBy: $orderBy) {
       pageInfo {
         hasNextPage
         endCursor
@@ -38,11 +33,11 @@ export const SEARCH_ISSUES_QUERY = gql`
           id
           name
           key
-        },
+        }
         project {
           id
           name
-        },
+        }
         priority
         labels {
           nodes {

@@ -1,4 +1,4 @@
-import { BaseToolResponse } from '../../../core/interfaces/tool-handler.interface.js';
+import { BaseToolResponse } from "../../../core/interfaces/tool-handler.interface.js";
 
 /**
  * Input types for issue operations
@@ -39,6 +39,18 @@ export interface SearchIssuesInput {
         eq?: string;
       };
     };
+    team?: {
+      key?: {
+        eq?: string;
+      };
+      id?: {
+        in?: string[];
+      };
+    };
+    number?: {
+      eq?: number;
+    };
+    search?: string;
   };
   teamIds?: string[];
   assigneeIds?: string[];
@@ -96,7 +108,7 @@ export interface IssueBatchResponse {
 export interface UpdateIssuesResponse {
   issueUpdate: {
     success: boolean;
-    issues: Issue[];
+    issue: Issue;
   };
 }
 
@@ -123,7 +135,9 @@ export interface DeleteIssueResponse {
 export interface IssueHandlerMethods {
   handleCreateIssue(args: CreateIssueInput): Promise<BaseToolResponse>;
   handleCreateIssues(args: CreateIssuesInput): Promise<BaseToolResponse>;
-  handleBulkUpdateIssues(args: BulkUpdateIssuesInput): Promise<BaseToolResponse>;
+  handleBulkUpdateIssues(
+    args: BulkUpdateIssuesInput
+  ): Promise<BaseToolResponse>;
   handleSearchIssues(args: SearchIssuesInput): Promise<BaseToolResponse>;
   handleDeleteIssue(args: DeleteIssueInput): Promise<BaseToolResponse>;
   handleDeleteIssues(args: DeleteIssuesInput): Promise<BaseToolResponse>;
