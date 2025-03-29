@@ -70,6 +70,11 @@ export const toolSchemas = {
           description: 'Issue priority (0-4)',
           optional: true,
         },
+        estimate: {
+          type: 'number',
+          description: 'Issue estimate points (typically 1, 2, 3, 5, 8, etc.)',
+          optional: true,
+        },
         createAsUser: {
           type: 'string',
           description: 'Name to display for the created issue',
@@ -210,6 +215,11 @@ export const toolSchemas = {
             priority: {
               type: 'number',
               description: 'New priority (0-4)',
+              optional: true,
+            },
+            estimate: {
+              type: 'number',
+              description: 'Issue estimate points (typically 1, 2, 3, 5, 8, etc.)',
               optional: true,
             },
           },
@@ -385,6 +395,11 @@ export const toolSchemas = {
               projectId: {
                 type: 'string',
                 description: 'Project ID',
+                optional: true,
+              },
+              estimate: {
+                type: 'number',
+                description: 'Issue estimate points (typically 1, 2, 3, 5, 8, etc.)',
                 optional: true,
               },
               labelIds: {

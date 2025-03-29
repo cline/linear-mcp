@@ -53,7 +53,7 @@ describe('LinearGraphQLClient', () => {
   });
 
   describe('searchIssues', () => {
-    it('should successfully search issues', async () => {
+    it('should successfully search issues with project filter', async () => {
       const mockResponse = {
         data: {
           issues: {
@@ -75,7 +75,7 @@ describe('LinearGraphQLClient', () => {
 
       mockRawRequest.mockResolvedValueOnce(mockResponse);
 
-      const searchInput: SearchIssuesInput = {
+      const searchInput = {
         filter: {
           project: {
             id: {
@@ -93,12 +93,108 @@ describe('LinearGraphQLClient', () => {
 
       expect(result).toEqual(mockResponse.data);
       expect(mockRawRequest).toHaveBeenCalled();
+      expect(mockRawRequest).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          filter: searchInput.filter
+        })
+      );
+    });
+
+    it('should successfully search issues with text query', async () => {
+      const mockResponse = {
+        data: {
+          issues: {
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: null
+            },
+            nodes: [
+              {
+                id: 'issue-1',
+                identifier: 'TEST-1',
+                title: 'Bug in search feature',
+                url: 'https://linear.app/test/issue/TEST-1'
+              }
+            ]
+          }
+        }
+      };
+
+      mockRawRequest.mockResolvedValueOnce(mockResponse);
+
+      // This simulates what our handler would create for a text search
+      const filter: Record<string, unknown> = {
+        or: [
+          { title: { containsIgnoreCase: 'search' } },
+          { number: { eq: null } }
+        ]
+      };
+
+      const result: SearchIssuesResponse = await graphqlClient.searchIssues(
+        filter,
+        10
+      );
+
+      expect(result).toEqual(mockResponse.data);
+      expect(mockRawRequest).toHaveBeenCalled();
+      expect(mockRawRequest).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          filter: filter
+        })
+      );
+    });
+
+    it('should successfully search issues with issue identifier', async () => {
+      const mockResponse = {
+        data: {
+          issues: {
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: null
+            },
+            nodes: [
+              {
+                id: 'issue-1',
+                identifier: 'TEST-123',
+                title: 'Test Issue 123',
+                url: 'https://linear.app/test/issue/TEST-123'
+              }
+            ]
+          }
+        }
+      };
+
+      mockRawRequest.mockResolvedValueOnce(mockResponse);
+
+      // This simulates what our handler would create for an identifier search
+      const filter: Record<string, unknown> = {
+        or: [
+          { title: { containsIgnoreCase: 'TEST-123' } },
+          { number: { eq: 123 } }
+        ]
+      };
+
+      const result: SearchIssuesResponse = await graphqlClient.searchIssues(
+        filter,
+        10
+      );
+
+      expect(result).toEqual(mockResponse.data);
+      expect(mockRawRequest).toHaveBeenCalled();
+      expect(mockRawRequest).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          filter: filter
+        })
+      );
     });
 
     it('should handle search errors', async () => {
       mockRawRequest.mockRejectedValueOnce(new Error('Search failed'));
 
-      const searchInput: SearchIssuesInput = {
+      const searchInput = {
         filter: {
           project: {
             id: {
@@ -140,11 +236,11 @@ describe('LinearGraphQLClient', () => {
       
       const result: CreateIssueResponse = await graphqlClient.createIssue(input);
 
-      // Verify single mutation call with array input
+      // Verify single mutation call with direct input (not array)
       expect(mockRawRequest).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          input: [input]
+          input: input
         })
       );
 
@@ -587,6 +683,44 @@ describe('LinearGraphQLClient', () => {
       await expect(
         graphqlClient.createIssueLabels([labelInput])
       ).rejects.toThrow('GraphQL operation failed: Label creation failed');
+    });
+  });
+
+  describe('updateIssue', () => {
+    it('should update a single issue', async () => {
+      const mockResponse = {
+        data: {
+          issueUpdate: {
+            success: true,
+            issue: {
+              id: 'issue-1',
+              identifier: 'TEST-1',
+              title: 'Updated Issue',
+              url: 'https://linear.app/test/issue/TEST-1',
+              state: {
+                name: 'In Progress'
+              }
+            }
+          }
+        }
+      };
+
+      mockRawRequest.mockResolvedValueOnce(mockResponse);
+
+      const id = 'issue-1';
+      const updateInput: UpdateIssueInput = { stateId: 'state-2' };
+      const result: UpdateIssuesResponse = await graphqlClient.updateIssue(id, updateInput);
+
+      expect(result).toEqual(mockResponse.data);
+      // Verify single mutation call with direct id (not array)
+      expect(mockRawRequest).toHaveBeenCalledTimes(1);
+      expect(mockRawRequest).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          id,
+          input: updateInput
+        })
+      );
     });
   });
 });
