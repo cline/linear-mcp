@@ -125,7 +125,8 @@ export class IssueHandler extends BaseHandler implements IssueHandlerMethods {
 
         // Search through all teams and their states to find a matching state name
         for (const team of teams) {
-          const matchingState = team.states.find(
+          // Access the 'nodes' array within the 'states' object, matching the updated type
+          const matchingState = team.states.nodes.find(
             (state: TeamState) => state.name.toLowerCase() === stateName
           );
 
