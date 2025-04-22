@@ -52,10 +52,13 @@ export const CREATE_BATCH_ISSUES = gql`
 `;
 
 export const UPDATE_ISSUES_MUTATION = gql`
-  mutation UpdateIssues($ids: [String!]!, $input: IssueUpdateInput!) {
-    issueUpdate(ids: $ids, input: $input) {
+  # Note: Changed from ids: [String!]! based on API error message
+  mutation UpdateIssue($id: String!, $input: IssueUpdateInput!) { 
+    # Assuming the mutation field itself might also be singular if it takes a single ID
+    issueUpdate(id: $id, input: $input) { 
       success
-      issues {
+      # The response might only contain one issue now, adjust if needed based on testing
+      issue { 
         id
         identifier
         title
