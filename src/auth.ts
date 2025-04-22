@@ -175,8 +175,9 @@ export class LinearAuth {
         refreshToken: '', // Not needed for PAT
         expiresAt: Number.MAX_SAFE_INTEGER, // PATs don't expire
       };
+      // Use apiKey instead of accessToken for PAT authentication
       this.linearClient = new LinearClient({
-        accessToken: config.accessToken,
+        apiKey: config.accessToken, // Corrected: Use apiKey for PAT
       });
     } else {
       // OAuth flow
