@@ -117,10 +117,41 @@ export class LinearGraphQLClient {
     });
   }
 
-  // Bulk update issues
+  // Bulk update issues (sequentially using single-ID mutation)
   async updateIssues(ids: string[], input: UpdateIssueInput): Promise<UpdateIssuesResponse> {
     const { UPDATE_ISSUES_MUTATION } = await import('./mutations.js');
-    return this.execute<UpdateIssuesResponse>(UPDATE_ISSUES_MUTATION, { ids, input });
+    const results: Issue[] = [];
+    let overallSuccess = true;
+
+    for (const id of ids) {
+      try {
+        // Execute update for each ID individually, matching the modified mutation
+        const result = await this.execute<{ issueUpdate: { success: boolean; issue?: Issue } }>(
+          UPDATE_ISSUES_MUTATION, 
+          { id, input } // Pass single 'id' and input
+        );
+        if (result.issueUpdate.success && result.issueUpdate.issue) {
+          results.push(result.issueUpdate.issue);
+        } else {
+          overallSuccess = false;
+          console.error(`Failed to update issue ${id}`);
+        }
+      } catch (error) {
+        overallSuccess = false;
+        console.error(`Error updating issue ${id}:`, error);
+      }
+    }
+
+    // Construct a plausible response for the bulk operation
+    return {
+      issueUpdate: {
+        success: overallSuccess,
+        // Note: The 'issues' field in the original UpdateIssuesResponse might not be 
+        // directly applicable here since we made separate calls. Returning the successfully 
+        // updated ones. Adjust if the handler expects something different.
+        issues: results, 
+      },
+    };
   }
 
   // Create multiple labels

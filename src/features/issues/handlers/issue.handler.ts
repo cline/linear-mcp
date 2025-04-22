@@ -99,6 +99,48 @@ export class IssueHandler extends BaseHandler implements IssueHandlerMethods {
         throw new Error('IssueIds parameter must be an array');
       }
 
+      // Handle state name instead of state ID (from PR #3 + fix)
+      if (
+        args.update.stateId &&
+        typeof args.update.stateId === 'string' &&
+        !args.update.stateId.match(
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+        )
+      ) {
+        // This looks like a state name, not a UUID
+        const stateName = args.update.stateId.toLowerCase();
+
+        // Get all teams to find the state
+        const teamsResponse = await client.getTeams();
+        // TODO: Add proper typing for teamsResponse if possible
+        const teams = (teamsResponse as any).teams.nodes; 
+
+        let stateId: string | undefined;
+
+        // Search through all teams and their states to find a matching state name
+        for (const team of teams) {
+          // Access the 'nodes' array within the 'states' object, matching the updated type
+          // TODO: Add proper typing for team.states if possible
+          const matchingState = (team.states as any).nodes.find(
+            (state: any) => state.name.toLowerCase() === stateName
+          );
+
+          if (matchingState) {
+            stateId = matchingState.id;
+            break;
+          }
+        }
+
+        if (!stateId) {
+          throw new Error(
+            `Could not find state with name: ${args.update.stateId}`
+          );
+        }
+
+        // Replace the state name with the state ID
+        args.update.stateId = stateId;
+      }
+
       const result = await client.updateIssues(args.issueIds, args.update) as UpdateIssuesResponse;
 
       if (!result.issueUpdate.success) {
@@ -122,9 +164,19 @@ export class IssueHandler extends BaseHandler implements IssueHandlerMethods {
 
       const filter: Record<string, unknown> = {};
       
-      if (args.query) {
+      // Check if the query looks like an issue identifier (e.g., EXE-5143) (from PR #3)
+      if (args.query && /^[A-Z]+-\d+$/.test(args.query.trim())) {
+        // If it's an issue identifier, parse the team key and issue number
+        const [teamKey, issueNumber] = args.query.trim().split('-');
+
+        // Use team.key and number filters instead of identifier
+        filter.team = { key: { eq: teamKey } };
+        filter.number = { eq: parseInt(issueNumber, 10) };
+      } else if (args.query) {
+        // Otherwise use it as a search term
         filter.search = args.query;
       }
+      
       if (args.filter?.project?.id?.eq) {
         filter.project = { id: { eq: args.filter.project.id.eq } };
       }
