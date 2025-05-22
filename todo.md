@@ -88,6 +88,7 @@
 - [ ] Create API documentation
 - [ ] Add examples for common operations
 - [ ] Document error handling strategies
+- [x] Implement comment functionality
 
 ### Testing
 - [x] Add unit tests for new type definitions

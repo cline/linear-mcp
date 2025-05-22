@@ -15,6 +15,12 @@ export interface ToolHandler {
   handleDeleteIssue(args: any): Promise<BaseToolResponse>;
   handleDeleteIssues(args: any): Promise<BaseToolResponse>;
 
+  // Comment Operations
+  handleCreateComment(args: any): Promise<BaseToolResponse>;
+  handleUpdateComment(args: any): Promise<BaseToolResponse>;
+  handleDeleteComment(args: any): Promise<BaseToolResponse>;
+  handleGetComments(args: any): Promise<BaseToolResponse>;
+
   // Project Operations
   handleCreateProjectWithIssues(args: any): Promise<BaseToolResponse>;
   handleGetProject(args: any): Promise<BaseToolResponse>;

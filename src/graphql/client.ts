@@ -14,6 +14,15 @@ import {
   IssueBatchResponse
 } from '../features/issues/types/issue.types.js';
 import {
+  CreateCommentInput,
+  UpdateCommentInput,
+  CommentUpdateInput,
+  CreateCommentResponse,
+  UpdateCommentResponse,
+  DeleteCommentResponse,
+  GetCommentsResponse
+} from '../features/comments/types/comment.types.js';
+import {
   ProjectInput,
   ProjectResponse,
   SearchProjectsResponse
@@ -181,5 +190,39 @@ export class LinearGraphQLClient {
   async deleteIssues(ids: string[]): Promise<DeleteIssueResponse> {
     const { DELETE_ISSUES_MUTATION } = await import('./mutations.js');
     return this.execute<DeleteIssueResponse>(DELETE_ISSUES_MUTATION, { ids });
+  }
+
+  // Comment operations
+  
+  // Create a comment
+  async createComment(input: CreateCommentInput): Promise<CreateCommentResponse> {
+    const { CREATE_COMMENT_MUTATION } = await import('./comment-mutations.js');
+    return this.execute<CreateCommentResponse>(CREATE_COMMENT_MUTATION, { input });
+  }
+
+  // Update a comment
+  async updateComment(id: string, input: CommentUpdateInput): Promise<UpdateCommentResponse> {
+    const { UPDATE_COMMENT_MUTATION } = await import('./comment-mutations.js');
+    return this.execute<UpdateCommentResponse>(UPDATE_COMMENT_MUTATION, { id, input });
+  }
+
+  // Delete a comment
+  async deleteComment(id: string): Promise<DeleteCommentResponse> {
+    const { DELETE_COMMENT_MUTATION } = await import('./comment-mutations.js');
+    return this.execute<DeleteCommentResponse>(DELETE_COMMENT_MUTATION, { id });
+  }
+
+  // Get comments for an issue
+  async getIssueComments(
+    issueId: string,
+    first: number = 50,
+    after?: string
+  ): Promise<GetCommentsResponse> {
+    const { GET_ISSUE_COMMENTS_QUERY } = await import('./comment-queries.js');
+    return this.execute<GetCommentsResponse>(GET_ISSUE_COMMENTS_QUERY, {
+      issueId,
+      first,
+      after
+    });
   }
 }
