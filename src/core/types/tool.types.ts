@@ -452,6 +452,32 @@ export const toolSchemas = {
     },
   },
 
+  // Alias for backward compatibility
+  linear_get_issue_comments: {
+    name: 'linear_get_issue_comments',
+    description: 'Get comments for an issue with pagination (alias for linear_get_comments)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        issueId: {
+          type: 'string',
+          description: 'ID of the issue to get comments for',
+        },
+        first: {
+          type: 'number',
+          description: 'Number of comments to return (default: 50)',
+          optional: true,
+        },
+        after: {
+          type: 'string',
+          description: 'Cursor for pagination',
+          optional: true,
+        },
+      },
+      required: ['issueId'],
+    },
+  },
+
   linear_create_issues: {
     name: 'linear_create_issues',
     description: 'Create multiple issues at once',

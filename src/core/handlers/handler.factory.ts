@@ -55,6 +55,8 @@ export class HandlerFactory {
       linear_update_comment: { handler: this.commentHandler, method: 'handleUpdateComment' },
       linear_delete_comment: { handler: this.commentHandler, method: 'handleDeleteComment' },
       linear_get_comments: { handler: this.commentHandler, method: 'handleGetComments' },
+      // Alias for backward compatibility
+      linear_get_issue_comments: { handler: this.commentHandler, method: 'handleGetComments' },
 
       // Project tools
       linear_create_project_with_issues: { handler: this.projectHandler, method: 'handleCreateProjectWithIssues' },
