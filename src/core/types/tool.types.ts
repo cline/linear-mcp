@@ -374,6 +374,110 @@ export const toolSchemas = {
     },
   },
 
+  linear_create_comment: {
+    name: 'linear_create_comment',
+    description: 'Create a new comment on an issue',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        body: {
+          type: 'string',
+          description: 'The comment text content',
+        },
+        issueId: {
+          type: 'string',
+          description: 'ID of the issue to comment on',
+        },
+      },
+      required: ['body', 'issueId'],
+    },
+  },
+
+  linear_update_comment: {
+    name: 'linear_update_comment',
+    description: 'Update an existing comment',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'string',
+          description: 'ID of the comment to update',
+        },
+        body: {
+          type: 'string',
+          description: 'New comment text content',
+        },
+      },
+      required: ['id', 'body'],
+    },
+  },
+
+  linear_delete_comment: {
+    name: 'linear_delete_comment',
+    description: 'Delete a comment',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'string',
+          description: 'ID of the comment to delete',
+        },
+      },
+      required: ['id'],
+    },
+  },
+
+  linear_get_comments: {
+    name: 'linear_get_comments',
+    description: 'Get comments for an issue with pagination',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        issueId: {
+          type: 'string',
+          description: 'ID of the issue to get comments for',
+        },
+        first: {
+          type: 'number',
+          description: 'Number of comments to return (default: 50)',
+          optional: true,
+        },
+        after: {
+          type: 'string',
+          description: 'Cursor for pagination',
+          optional: true,
+        },
+      },
+      required: ['issueId'],
+    },
+  },
+
+  // Alias for backward compatibility
+  linear_get_issue_comments: {
+    name: 'linear_get_issue_comments',
+    description: 'Get comments for an issue with pagination (alias for linear_get_comments)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        issueId: {
+          type: 'string',
+          description: 'ID of the issue to get comments for',
+        },
+        first: {
+          type: 'number',
+          description: 'Number of comments to return (default: 50)',
+          optional: true,
+        },
+        after: {
+          type: 'string',
+          description: 'Cursor for pagination',
+          optional: true,
+        },
+      },
+      required: ['issueId'],
+    },
+  },
+
   linear_create_issues: {
     name: 'linear_create_issues',
     description: 'Create multiple issues at once',

@@ -39,7 +39,7 @@ export abstract class BaseHandler {
     return {
       content: [
         {
-          type: 'text',
+          type: 'text/plain',
           text,
         },
       ],
@@ -50,7 +50,14 @@ export abstract class BaseHandler {
    * Creates a JSON response with the given data.
    */
   protected createJsonResponse(data: unknown): BaseToolResponse {
-    return this.createResponse(JSON.stringify(data, null, 2));
+    return {
+      content: [
+        {
+          type: 'application/json',
+          text: JSON.stringify(data, null, 2),
+        },
+      ],
+    };
   }
 
   /**
