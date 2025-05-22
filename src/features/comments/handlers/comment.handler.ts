@@ -48,7 +48,7 @@ export class CommentHandler extends BaseHandler implements CommentHandlerMethods
         `Body: ${comment.body.substring(0, 50)}${comment.body.length > 50 ? '...' : ''}`
       );
     } catch (error) {
-      this.handleError(error, 'create comment');
+      return this.handleError(error, 'create comment');
     }
   }
 
@@ -76,7 +76,7 @@ export class CommentHandler extends BaseHandler implements CommentHandlerMethods
         `Body: ${comment.body.substring(0, 50)}${comment.body.length > 50 ? '...' : ''}`
       );
     } catch (error) {
-      this.handleError(error, 'update comment');
+      return this.handleError(error, 'update comment');
     }
   }
 
@@ -96,7 +96,7 @@ export class CommentHandler extends BaseHandler implements CommentHandlerMethods
 
       return this.createResponse(`Successfully deleted comment ${args.id}`);
     } catch (error) {
-      this.handleError(error, 'delete comment');
+      return this.handleError(error, 'delete comment');
     }
   }
 
@@ -121,7 +121,7 @@ export class CommentHandler extends BaseHandler implements CommentHandlerMethods
 
       return this.createJsonResponse(result);
     } catch (error) {
-      this.handleError(error, 'get comments');
+      return this.handleError(error, 'get comments');
     }
   }
 }
