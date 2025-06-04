@@ -110,6 +110,10 @@ export const SEARCH_PROJECTS_QUERY = gql`
         id
         name
         description
+        documentContent {
+          content
+          contentState
+        }
         url
         teams {
           nodes {
@@ -128,11 +132,71 @@ export const GET_PROJECT_QUERY = gql`
       id
       name
       description
+      documentContent {
+        content
+        contentState
+      }
       url
       teams {
         nodes {
           id
           name
+        }
+      }
+    }
+  }
+`;
+
+export const GET_ISSUE_COMMENTS_QUERY = gql`
+  query GetIssueComments(
+    $issueId: String!
+    $first: Int
+    $after: String
+    $includeArchived: Boolean
+  ) {
+    issue(id: $issueId) {
+      id
+      title
+      comments(
+        first: $first
+        after: $after
+        includeArchived: $includeArchived
+        orderBy: createdAt
+      ) {
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+        nodes {
+          id
+          body
+          bodyData
+          user {
+            id
+            name
+            email
+          }
+          parent {
+            id
+            body
+            user {
+              id
+              name
+            }
+          }
+          children(first: 10) {
+            nodes {
+              id
+              body
+              user {
+                id
+                name
+              }
+              createdAt
+            }
+          }
+          createdAt
+          updatedAt
         }
       }
     }

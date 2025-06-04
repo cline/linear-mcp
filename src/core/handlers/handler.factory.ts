@@ -5,6 +5,7 @@ import { IssueHandler } from '../../features/issues/handlers/issue.handler.js';
 import { ProjectHandler } from '../../features/projects/handlers/project.handler.js';
 import { TeamHandler } from '../../features/teams/handlers/team.handler.js';
 import { UserHandler } from '../../features/users/handlers/user.handler.js';
+import { CommentHandler } from '../../features/comments/handlers/comment.handler.js';
 
 /**
  * Factory for creating and managing feature-specific handlers.
@@ -16,6 +17,7 @@ export class HandlerFactory {
   private projectHandler: ProjectHandler;
   private teamHandler: TeamHandler;
   private userHandler: UserHandler;
+  private commentHandler: CommentHandler;
 
   constructor(auth: LinearAuth, graphqlClient?: LinearGraphQLClient) {
     // Initialize all handlers with shared dependencies
@@ -24,13 +26,14 @@ export class HandlerFactory {
     this.projectHandler = new ProjectHandler(auth, graphqlClient);
     this.teamHandler = new TeamHandler(auth, graphqlClient);
     this.userHandler = new UserHandler(auth, graphqlClient);
+    this.commentHandler = new CommentHandler(auth, graphqlClient);
   }
 
   /**
    * Gets the appropriate handler for a given tool name.
    */
   getHandlerForTool(toolName: string): {
-    handler: AuthHandler | IssueHandler | ProjectHandler | TeamHandler | UserHandler;
+    handler: AuthHandler | IssueHandler | ProjectHandler | TeamHandler | UserHandler | CommentHandler;
     method: string;
   } {
     // Map tool names to their handlers and methods
@@ -57,6 +60,10 @@ export class HandlerFactory {
 
       // User tools
       linear_get_user: { handler: this.userHandler, method: 'handleGetUser' },
+
+      // Comment tools
+      linear_get_issue_comments: { handler: this.commentHandler, method: 'handleGetIssueComments' },
+      linear_create_comment: { handler: this.commentHandler, method: 'handleCreateComment' },
     };
 
     const handlerInfo = handlerMap[toolName];

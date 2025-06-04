@@ -2,6 +2,7 @@ import { BaseHandler } from '../../../core/handlers/base.handler.js';
 import { BaseToolResponse } from '../../../core/interfaces/tool-handler.interface.js';
 import { LinearAuth } from '../../../auth.js';
 import { LinearGraphQLClient } from '../../../graphql/client.js';
+import { getProjectDescription } from '../types/project.types.js';
 
 /**
  * Handler for project-related operations.
@@ -82,11 +83,19 @@ export class ProjectHandler extends BaseHandler {
       const { project } = result.projectCreate;
       const issuesCreated = result.issueBatchCreate?.issues.length ?? 0;
 
+      // Use utility function to get proper description
+      const projectDescription = getProjectDescription(project);
+
       const response = [
         `Successfully created project with issues`,
         `Project: ${project.name}`,
         `Project URL: ${project.url}`
       ];
+
+      // Add description if available
+      if (projectDescription) {
+        response.push(`Description: ${projectDescription}`);
+      }
 
       if (issuesCreated > 0) {
         response.push(`Issues created: ${issuesCreated}`);
@@ -112,7 +121,16 @@ export class ProjectHandler extends BaseHandler {
 
       const result = await client.getProject(args.id);
 
-      return this.createJsonResponse(result);
+      // Process the result to include proper description
+      const processedResult = {
+        ...result,
+        project: {
+          ...result.project,
+          actualDescription: getProjectDescription(result.project)
+        }
+      };
+
+      return this.createJsonResponse(processedResult);
     } catch (error) {
       this.handleError(error, 'get project info');
     }
@@ -130,7 +148,19 @@ export class ProjectHandler extends BaseHandler {
         name: { eq: args.name }
       });
 
-      return this.createJsonResponse(result);
+      // Process the result to include proper descriptions for all projects
+      const processedResult = {
+        ...result,
+        projects: {
+          ...result.projects,
+          nodes: result.projects.nodes.map(project => ({
+            ...project,
+            actualDescription: getProjectDescription(project)
+          }))
+        }
+      };
+
+      return this.createJsonResponse(processedResult);
     } catch (error) {
       this.handleError(error, 'search projects');
     }

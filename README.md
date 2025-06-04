@@ -89,11 +89,14 @@ The server currently supports the following operations:
 - ✅ Search issues with filtering
 - ✅ Associate issues with projects
 - ✅ Create parent/child issue relationships
+- ✅ Read and create comments and threaded comments
 
 ### Project Management
 - ✅ Create projects with associated issues
-- ✅ Get project information
+- ✅ Get project information **with rich text descriptions**
+- ✅ Search projects **with rich text descriptions**
 - ✅ Associate issues with projects
+- ✅ Proper description handling using Linear's `documentContent` field
 
 ### Team Management
 - ✅ Get team information (with states and workflow details)
@@ -110,12 +113,32 @@ The server currently supports the following operations:
 ### Bulk Updates (In Testing)
 - 🚧 Bulk issue updates (parallel processing implemented, needs testing)
 
+## Rich Text Description Support
+
+The server now properly handles Linear's rich text descriptions for projects:
+
+- **Legacy Support**: Maintains compatibility with the old `description` field
+- **Rich Content**: Uses Linear's `documentContent` field for actual description content
+- **Automatic Fallback**: Falls back to legacy field if rich content is unavailable
+- **Type Safety**: Includes proper TypeScript types for both description formats
+
+### How It Works
+
+Linear uses a dual-field system for descriptions:
+1. `description` - Legacy field (often empty for backward compatibility)
+2. `documentContent.content` - Contains the actual rich text description content
+
+The MCP server automatically:
+- Queries both fields from Linear's API
+- Prioritizes `documentContent.content` over the legacy `description` field
+- Provides a utility function `getProjectDescription()` for consistent access
+- Returns an `actualDescription` field in responses for easy access
+
 ## Features in Development
 
 The following features are currently being worked on:
 
 ### Issue Management
-- 🚧 Comment functionality (add/edit comments, threading)
 - 🚧 Complex search filters
 - 🚧 Pagination support for large result sets
 
@@ -168,3 +191,20 @@ For OAuth testing:
 1. Configure OAuth credentials in `.env`
 2. Remove `.skip` from OAuth tests in `src/__tests__/auth.integration.test.ts`
 3. Run integration tests
+
+## Recent Improvements
+
+### Project Description Support (Latest)
+- ✅ Fixed empty project descriptions by implementing Linear's `documentContent` field support
+- ✅ Added proper TypeScript types for rich text content
+- ✅ Implemented automatic fallback from rich content to legacy description
+- ✅ Updated all project-related queries and handlers
+- ✅ Added comprehensive tests for new description handling
+- ✅ Maintained backward compatibility with existing API consumers
+
+### Previous Improvements
+- ✅ Enhanced type safety across all operations
+- ✅ Implemented true batch operations for better performance
+- ✅ Improved error handling and validation
+- ✅ Added comprehensive test coverage
+- ✅ Refactored architecture for better maintainability

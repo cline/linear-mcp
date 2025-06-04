@@ -15,7 +15,8 @@ import {
 import {
   ProjectInput,
   ProjectResponse,
-  SearchProjectsResponse
+  SearchProjectsResponse,
+  GetProjectResponse
 } from '../features/projects/types/project.types';
 import {
   TeamResponse,
@@ -274,7 +275,12 @@ describe('LinearGraphQLClient', () => {
               project: {
                 id: 'project-1',
                 name: 'New Project',
-                url: 'https://linear.app/test/project/1'
+                url: 'https://linear.app/test/project/1',
+                description: '',
+                documentContent: {
+                  content: 'This is the actual project description',
+                  contentState: '{"type":"doc","content":[]}'
+                }
               },
               lastSyncId: 123
             }
@@ -297,6 +303,86 @@ describe('LinearGraphQLClient', () => {
       });
     });
 
+    describe('getProject', () => {
+      it('should successfully get a project with documentContent', async () => {
+        const mockResponse = {
+          data: {
+            project: {
+              id: 'project-1',
+              name: 'Test Project',
+              description: '',
+              documentContent: {
+                content: 'This is the rich text description',
+                contentState: '{"type":"doc","content":[]}'
+              },
+              url: 'https://linear.app/test/project/1',
+              teams: {
+                nodes: [
+                  {
+                    id: 'team-1',
+                    name: 'Engineering'
+                  }
+                ]
+              }
+            }
+          }
+        };
+
+        mockRawRequest.mockResolvedValueOnce(mockResponse);
+
+        const result: GetProjectResponse = await graphqlClient.getProject('project-1');
+        expect(result).toEqual(mockResponse.data);
+        expect(mockRawRequest).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({ id: 'project-1' })
+        );
+      });
+    });
+
+    describe('searchProjects', () => {
+      it('should successfully search projects with documentContent', async () => {
+        const mockResponse = {
+          data: {
+            projects: {
+              nodes: [
+                {
+                  id: 'project-1',
+                  name: 'Test Project',
+                  description: '',
+                  documentContent: {
+                    content: 'Rich text project description',
+                    contentState: '{"type":"doc","content":[]}'
+                  },
+                  url: 'https://linear.app/test/project/1',
+                  teams: {
+                    nodes: [
+                      {
+                        id: 'team-1',
+                        name: 'Engineering'
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        };
+
+        mockRawRequest.mockResolvedValueOnce(mockResponse);
+
+        const result: SearchProjectsResponse = await graphqlClient.searchProjects({
+          name: { eq: 'Test Project' }
+        });
+        expect(result).toEqual(mockResponse.data);
+        expect(mockRawRequest).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({
+            filter: { name: { eq: 'Test Project' } }
+          })
+        );
+      });
+    });
+
     describe('createProjectWithIssues', () => {
       it('should successfully create project with issues', async () => {
         const projectMockResponse = {
@@ -306,7 +392,12 @@ describe('LinearGraphQLClient', () => {
               project: {
                 id: 'project-1',
                 name: 'New Project',
-                url: 'https://linear.app/test/project/1'
+                url: 'https://linear.app/test/project/1',
+                description: '',
+                documentContent: {
+                  content: 'Project description content',
+                  contentState: '{"type":"doc","content":[]}'
+                }
               },
               lastSyncId: 123
             }

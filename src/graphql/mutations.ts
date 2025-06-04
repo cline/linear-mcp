@@ -135,3 +135,35 @@ export const CREATE_ISSUE_LABELS = gql`
     }
   }
 `;
+
+export const CREATE_COMMENT_MUTATION = gql`
+  mutation CreateComment($input: CommentCreateInput!) {
+    commentCreate(input: $input) {
+      success
+      comment {
+        id
+        body
+        user {
+          id
+          name
+          email
+        }
+        issue {
+          id
+          title
+        }
+        parent {
+          id
+          body
+          user {
+            id
+            name
+          }
+        }
+        createdAt
+        updatedAt
+      }
+      lastSyncId
+    }
+  }
+`;

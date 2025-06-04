@@ -16,7 +16,8 @@ import {
 import {
   ProjectInput,
   ProjectResponse,
-  SearchProjectsResponse
+  SearchProjectsResponse,
+  GetProjectResponse
 } from '../features/projects/types/project.types.js';
 import {
   TeamResponse,
@@ -26,6 +27,11 @@ import {
 import {
   UserResponse
 } from '../features/users/types/user.types.js';
+import {
+  CreateCommentInput,
+  CreateCommentResponse,
+  GetIssueCommentsResponse
+} from '../features/comments/types/comment.types.js';
 
 export class LinearGraphQLClient {
   private linearClient: LinearClient;
@@ -157,13 +163,13 @@ export class LinearGraphQLClient {
     return this.execute<UserResponse>(GET_USER_QUERY);
   }
 
-  // Get project info
-  async getProject(id: string): Promise<ProjectResponse> {
+  // Get project info with documentContent support
+  async getProject(id: string): Promise<GetProjectResponse> {
     const { GET_PROJECT_QUERY } = await import('./queries.js');
-    return this.execute<ProjectResponse>(GET_PROJECT_QUERY, { id });
+    return this.execute<GetProjectResponse>(GET_PROJECT_QUERY, { id });
   }
 
-  // Search projects
+  // Search projects with documentContent support
   async searchProjects(filter: { name?: { eq: string } }): Promise<SearchProjectsResponse> {
     const { SEARCH_PROJECTS_QUERY } = await import('./queries.js');
     return this.execute<SearchProjectsResponse>(SEARCH_PROJECTS_QUERY, { filter });
@@ -181,5 +187,27 @@ export class LinearGraphQLClient {
   async deleteIssues(ids: string[]): Promise<DeleteIssueResponse> {
     const { DELETE_ISSUES_MUTATION } = await import('./mutations.js');
     return this.execute<DeleteIssueResponse>(DELETE_ISSUES_MUTATION, { ids });
+  }
+
+  // Get comments for an issue
+  async getIssueComments(
+    issueId: string,
+    first: number = 50,
+    after?: string,
+    includeArchived: boolean = false
+  ): Promise<GetIssueCommentsResponse> {
+    const { GET_ISSUE_COMMENTS_QUERY } = await import('./queries.js');
+    return this.execute<GetIssueCommentsResponse>(GET_ISSUE_COMMENTS_QUERY, {
+      issueId,
+      first,
+      after,
+      includeArchived
+    });
+  }
+
+  // Create a comment
+  async createComment(input: CreateCommentInput): Promise<CreateCommentResponse> {
+    const { CREATE_COMMENT_MUTATION } = await import('./mutations.js');
+    return this.execute<CreateCommentResponse>(CREATE_COMMENT_MUTATION, { input });
   }
 }

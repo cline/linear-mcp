@@ -4,6 +4,43 @@
  */
 
 /**
+ * Document content structure for rich text descriptions
+ */
+export interface DocumentContent {
+  /** Markdown/plain text version of the content */
+  content?: string;
+  /** Document state information for rich text formatting */
+  contentState?: string;
+}
+
+/**
+ * Project information with proper description handling
+ */
+export interface Project {
+  id: string;
+  name: string;
+  /** Legacy description field (usually empty) */
+  description?: string;
+  /** Rich content description field (actual content) */
+  documentContent?: DocumentContent;
+  url: string;
+  teams?: {
+    nodes: Array<{
+      id: string;
+      name: string;
+    }>;
+  };
+}
+
+/**
+ * Utility function to get the actual project description
+ * Prioritizes documentContent.content over legacy description field
+ */
+export function getProjectDescription(project: Project): string {
+  return project.documentContent?.content || project.description || '';
+}
+
+/**
  * Input for creating a new project
  * @example
  * ```typescript
@@ -36,11 +73,7 @@ export interface ProjectInput {
 export interface ProjectResponse {
   projectCreate: {
     success: boolean;
-    project: {
-      id: string;
-      name: string;
-      url: string;
-    };
+    project: Project;
     lastSyncId: number;
   };
   issueBatchCreate?: {
@@ -57,6 +90,10 @@ export interface ProjectResponse {
 
 export interface SearchProjectsResponse {
   projects: {
-    nodes: Array<ProjectResponse['projectCreate']['project']>;
+    nodes: Project[];
   };
+}
+
+export interface GetProjectResponse {
+  project: Project;
 }

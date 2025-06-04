@@ -434,4 +434,68 @@ export const toolSchemas = {
       required: ['issues'],
     },
   },
+
+  linear_get_issue_comments: {
+    name: 'linear_get_issue_comments',
+    description: 'Get comments for a specific issue, including threaded replies',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        issueId: {
+          type: 'string',
+          description: 'Issue ID to get comments for',
+        },
+        first: {
+          type: 'number',
+          description: 'Number of comments to return (default: 50)',
+          optional: true,
+        },
+        after: {
+          type: 'string',
+          description: 'Cursor for pagination',
+          optional: true,
+        },
+        includeArchived: {
+          type: 'boolean',
+          description: 'Include archived comments (default: false)',
+          optional: true,
+        },
+      },
+      required: ['issueId'],
+    },
+  },
+
+  linear_create_comment: {
+    name: 'linear_create_comment',
+    description: 'Create a new comment on an issue or reply to an existing comment',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        body: {
+          type: 'string',
+          description: 'Comment content in markdown format',
+        },
+        issueId: {
+          type: 'string',
+          description: 'Issue ID to comment on',
+        },
+        parentCommentId: {
+          type: 'string',
+          description: 'Parent comment ID for threaded replies (optional)',
+          optional: true,
+        },
+        createAsUser: {
+          type: 'string',
+          description: 'Name to display for the comment creator (OAuth apps only)',
+          optional: true,
+        },
+        displayIconUrl: {
+          type: 'string',
+          description: 'URL of the avatar to display (OAuth apps only)',
+          optional: true,
+        },
+      },
+      required: ['body', 'issueId'],
+    },
+  },
 };
